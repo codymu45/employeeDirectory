@@ -21,17 +21,17 @@ function Container() {
     const [searchedUser, setSearchedUser] = useState('');
     const [buttonText, setButtonText] = useState('Sort by Name');
 
-    //seperate function that loads users from api and saves it to state as an array
+    // Loading users to be rendered
     function loadUsers() {
-        API.getUsers(amount)
-            .then(res => {
-                setUsers(res.data.results);
-            }).catch(err => console.log(err));
+      API.getUsers(amount)
+        .then(res => {
+          setUsers(res.data.results);
+        }).catch(err => console.log(err));
     };
-    //holds the custom hook that uses the typed input and set delay amount that filters through current state array
+    // Using debounce to slow down rendering rate when filtering/sorting
     const debouncedInput = useDebounce(searchedUser, 100);
 
-    //The if conditional only occurs when the there is a debouncedInput, the else conditional still happens, loading the users from the api
+    // If statement in case of a debounced input
     useEffect(() => {
       if (debouncedInput) {
         filterAPI();
@@ -46,8 +46,7 @@ function Container() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [amount]);
 
-    //filter out object from api array that matches the searchedUser(typed input in search)
-    //filter from api so the user doesn't need to backspace all the way (and let state reload with all users) before changing input
+    // Filter function to search the API for input from the user
     function filterAPI() {
       API.getUsers(amount)
         .then(res => {
@@ -59,8 +58,7 @@ function Container() {
           const lowerCaseSearchedUser = searchedUser.toLocaleLowerCase();
           const full = `${first} ${last}`;
           const fullOriginal = `${name.name.first} ${name.name.last}`
-            //'includes' method compares any piece of name to string (from object) so that if user only knows a part of the employee's name the api will still be called
-            //compares input to object whether the user types in all lower case or capitalizes the first letter
+    
             if (full.includes(lowerCaseSearchedUser)) {
               return true;
             } else if (fullOriginal.includes(searchedUser)) {
@@ -70,22 +68,20 @@ function Container() {
             setUsers(employee);
         });
     }
-    //grabs value in input and saves it to state
+    // Setting state from the input
     const handleInputChange = event => {
         const value = event.target.value;
         setSearchedUser(value);
     };
 
-    //grabs value in input and saves it to state
+    // Setting state of amount of employees
     const handleAmountChange = event => {
       const value = event.target.value;
       setAmount(value);
       setUsers([]);
-      // loadUsers(amount);
     };
 
-    //when button is clicked, sort state array alphabetically and text of button changes
-    //to unalphabetize state array, click 'reset' and it sets button text back to alphabetize
+    // Sorting button to sort list by last name
     const changeButtonText = event => {
       event.preventDefault();
 
@@ -99,44 +95,44 @@ function Container() {
         }
     }
 
-    //a function that splits the dob to only get the month day and year and then call it in map
+    // Date of Birth reformatting
     function renderDob(str) {
-        return str.slice(0, 10);
+      return str.slice(0, 10);
     }
-    //returns components
+
+    // Returning content and components
     return (
-        <div className='container'>
-            
-          <FilterRow>
-            <Amount
-              handleAmountChange={handleAmountChange}
-              value={amount}
-            />
-            <Searchbar
-              handleInputChange={handleInputChange}
-              value={searchedUser}
-            />
-            <SortBtn
-              changeButtonText={changeButtonText}
-              text={buttonText}
-            />
-            </FilterRow>
-            <Table>
-                <TableHeader />
-                <TableBody>
-                    {users.map((user, index) => (
-                        <TableRow
-                            key={user.name.last + index}
-                            picture={user.picture.thumbnail}
-                            name={`${user.name.first} ${user.name.last}`}
-                            phone={user.phone}
-                            email={user.email}
-                            dob={renderDob(user.dob.date)}
-                        />
-                    ))}
-                </TableBody>
-            </Table>
-        </div>
+      <div className='container'>    
+        <FilterRow>
+          <Amount
+            handleAmountChange={handleAmountChange}
+            value={amount}
+          />
+          <Searchbar
+            handleInputChange={handleInputChange}
+            value={searchedUser}
+          />
+          <SortBtn
+            changeButtonText={changeButtonText}
+            text={buttonText}
+          />
+        </FilterRow>
+        <Table>
+          <TableHeader />
+          <TableBody>
+            {users.map((user, index) => (
+              <TableRow
+                key={user.name.last + index}
+                picture={user.picture.thumbnail}
+                name={`${user.name.first} ${user.name.last}`}
+                phone={user.phone}
+                email={user.email}
+                dob={renderDob(user.dob.date)}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     );
 
 };
