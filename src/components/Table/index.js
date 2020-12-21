@@ -1,6 +1,6 @@
 import React from 'react';
 
-// Returning our table 
+// Returning table 
 function Table(props) {
     return (
         <div className="table-responsive">
